@@ -12,6 +12,17 @@ class UserService {
       return http.http500(undefined, error);
     }
   }
+
+  async findUserById(id: string) {
+    try {
+      const user = await userQuery.findUserById(id);
+      if (!user) return http.http400("User not found");
+      return http.http200("User found", user);
+    } catch (error) {
+      return http.http500(undefined, error);
+    }
+  }
+
   async createUser(data: IAuth) {
     try {
       const res_created = await userQuery.createUser(data);

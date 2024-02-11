@@ -1,5 +1,6 @@
 import { query } from "../database/postgresql";
 
+
 class BoardStatusQuery {
   async createStatusInitial(board_id: string) {
     const sql =

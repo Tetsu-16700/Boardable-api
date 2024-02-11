@@ -34,7 +34,25 @@ class AuthService {
         id: user.response.data.id,
       };
       const token = jwt.sign(format, "supersecret");
+
       return http.http200("login succesfully", { token });
+    } catch (error) {
+      return http.http500("Error in login service", error);
+    }
+  }
+  async validation(token: string) {
+    try {
+      if (!token) return http.http401("Error authenticating 2");
+      const decodeToken = jwt.verify(token, "supersecret") as any;
+
+      if (decodeToken.id) {
+        const res_user = await userService.findUserById(decodeToken.id);
+        if (!res_user.response.ok) return http.http401("Error authenticating");
+        return http.http200("Authentication success", {
+          id: res_user.response.data.id,
+        });
+      }
+      return http.http401("Error authenticating");
     } catch (error) {
       return http.http500("Error in login service", error);
     }
