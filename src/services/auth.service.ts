@@ -3,6 +3,7 @@ import { IAuth } from "../models/interfaces/auth.interface";
 import bcrypt from "bcrypt";
 import { userService } from "./user.service";
 import jwt from "jsonwebtoken";
+import { userQuery } from "../querys/user.query";
 
 class AuthService {
   async signup(data: IAuth) {
@@ -54,6 +55,42 @@ class AuthService {
       }
       return http.http401("Error authenticating");
     } catch (error) {
+      return http.http500("Error in login service", error);
+    }
+  }
+
+  async me(token: string) {
+    try {
+      if (!token) return http.http401("Error authenticating ");
+      const { id } = jwt.verify(token, "supersecret") as any;
+
+      const res_user = await userService.findUserById(id);
+      if (!res_user.response.ok) return res_user;
+      return res_user;
+    } catch (error) {
+      return http.http500("Error in login service", error);
+    }
+  }
+  async updateUser(token: string, data: any) {
+    try {
+      console.log(data);
+      if (!token) return http.http401("Error authenticating");
+      const { id } = jwt.verify(token, "supersecret") as any;
+
+      if (data.passwords.length) {
+        const newPassword = await bcrypt.hash(data.password, 11);
+
+        const res_update = await userQuery.updateUserWithPassword(
+          { ...data, password: newPassword },
+          id
+        );
+        return http.http200("Update user", res_update);
+      } else {
+        const res_update = await userQuery.updateUserWithoutPassword(data, id);
+        return http.http200("Update user", res_update);
+      }
+    } catch (error) {
+      console.log(error);
       return http.http500("Error in login service", error);
     }
   }
