@@ -1,7 +1,9 @@
 import { http } from "../models/http/response.http";
 import { IBoard } from "../models/interfaces/board.interface";
-import { boardQuery } from "../querys/board.query";
-import { boardStatusQuery } from "../querys/board_status";
+import { boardStatusQuery } from "../querys/board.query";
+import { boardQuery } from "../querys/board_status";
+// import { boardQuery } from "../querys/board.query";
+// import { boardStatusQuery } from "../querys/board_status";
 import { cardQuery } from "../querys/card.query";
 import { authService } from "./auth.service";
 
@@ -80,8 +82,71 @@ class BoardService {
       const res_update = await boardQuery.updateBoard(board_id, title);
       return http.http200("Board updated", res_update);
     } catch (error) {
-      console.log(error);
       return http.http500("Error in update boards", error);
+    }
+  }
+
+  async deleteBoard(board_id: string, token: string) {
+    try {
+      const res_validate = await authService.validation(token);
+      if (!res_validate.response.ok) return res_validate;
+      const user_id = res_validate.response.data.id;
+      const res_board = await boardQuery.findBoardForId(board_id);
+      if (!res_board) return http.http400("The board does not exist");
+
+      if (res_board.user_id != user_id)
+        return http.http401("No authorization board");
+
+      await boardQuery.deleteBoard(board_id);
+      return http.http200("Board deleted");
+    } catch (error) {
+      return http.http500("Error in delete boards", error);
+    }
+  }
+
+  async deleteBoardStatus(status_id: string, board_id: string, token: string) {
+    try {
+      const res_validate = await authService.validation(token);
+      if (!res_validate.response.ok) return res_validate;
+      const user_id = res_validate.response.data.id;
+
+      const res_board = await boardQuery.findBoardForId(board_id);
+      if (!res_board) return http.http400("The board does not exist");
+
+      if (res_board.user_id != user_id)
+        return http.http401("No authorization board");
+
+      await boardStatusQuery.deleteStatus(status_id);
+      return http.http200("Delete status");
+    } catch (error) {
+      return http.http500("Error in delete boards", error);
+    }
+  }
+
+  async createBoardStatus(
+    board_id: string,
+    description: string,
+    token: string
+  ) {
+    try {
+      const res_validate = await authService.validation(token);
+      if (!res_validate.response.ok) return res_validate;
+      const user_id = res_validate.response.data.id;
+
+      const res_board = await boardQuery.findBoardForId(board_id);
+      if (!res_board) return http.http400("The board does not exist");
+
+      if (res_board.user_id != user_id)
+        return http.http401("No authorization board");
+
+      const res_create = await boardStatusQuery.createNewStatus(
+        board_id,
+        description
+      );
+      return http.http201("Status created", res_create);
+    } catch (error) {
+      console.log(error);
+      return http.http500("Error in delete boards", error);
     }
   }
 }

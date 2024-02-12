@@ -35,12 +35,30 @@ boardRouter.post(
   boardController.createBoard
 );
 
+boardRouter.delete(
+  `${prefix}/:id`,
+  authMiddleware.authorization,
+  boardController.deleteBoard
+);
+
 // status --------------------------------------------------------------------------------
 
 boardRouter.get(
   `${prefix}/:id/status`,
   authMiddleware.authorization,
   boardController.findStatus
+);
+
+boardRouter.post(
+  `${prefix}/:id/status`,
+  authMiddleware.authorization,
+  boardController.createBoardStatus
+);
+
+boardRouter.delete(
+  `${prefix}/:id/status/:status_id`,
+  authMiddleware.authorization,
+  boardController.deleteStatus
 );
 
 // board detail  ibamos a borrarlo ----------------------------------------------------------

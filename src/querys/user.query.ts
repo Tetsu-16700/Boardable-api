@@ -23,7 +23,7 @@ class UserQuery {
 
   async updateUserWithPassword(data: any, user_id: string) {
     const sql =
-      "update users set username=$1, name=$2, email=$3, password=$4 where id = $5 returnig*";
+      "update users set username=$1, name=$2, email=$3, password=$4 where id = $5 returning*";
     await query(sql, [
       data.username,
       data.name,
@@ -35,7 +35,7 @@ class UserQuery {
 
   async updateUserWithoutPassword(data: any, user_id: string) {
     const sql =
-      "update users set username=$1, name=$2, email=$3 wheree id = $4 returning*";
+      "update users set username=$1, name=$2, email=$3 where id = $4 returning*";
     await query(sql, [data.username, data.name, data.email, user_id]);
   }
 }

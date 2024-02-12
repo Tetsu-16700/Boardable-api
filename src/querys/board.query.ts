@@ -1,44 +1,31 @@
 import { query } from "../database/postgresql";
-import { IBoard } from "../models/interfaces/board.interface";
 
-class BoardQuery {
-  async findBoardForUser(id: string, user_id: string) {
-    const sql = " select*from boards where id=$1 and user_id=$2";
-    const response = await query(sql, [id, user_id]);
-    return response.rows[0];
-  }
-
-  async findBoards(user_id: string) {
-    const sql = "select*from boards where user_id = $1 and deleted=false";
-    const response = await query(sql, [user_id]);
-    return response.rows;
-  }
-
-  // Este deberia crear los status pára el board
-  async createBoard(user_id: string, data: IBoard) {
+class BoardStatusQuery {
+  async createStatusInitial(board_id: string) {
     const sql =
-      "insert into boards(user_id,title,color) values($1,$2,$3) returning*";
-    const response = await query(sql, [user_id, data.title, data.color]);
+      "INSERT INTO board_status (board_id, description) VALUES ($1, 'To do'), ($1, 'Doing'), ($1, 'Done');";
+
+    await query(sql, [board_id]);
+  }
+
+  async createNewStatus(board_id: string, description: string) {
+    const sql =
+      "INSERT INTO board_status (board_id, description) VALUES ($1, $2) returning*;";
+
+    const response = await query(sql, [board_id, description]);
     return response.rows[0];
   }
 
-  async findBoardForTitle(title: string) {
-    const sql = "select*from boards where title = $1";
-    const response = await query(sql, [title]);
-    return response.rows[0];
+  async deleteStatus(status_id: string) {
+    const sql = "update  board_status set deleted=true where id =$1";
+    await query(sql, [status_id]);
   }
 
-  async findBoardForId(id: string) {
-    const sql = "select*from boards where id = $1 and deleted=false";
-    const response = await query(sql, [id]);
-    return response.rows[0];
-  }
-
-  async updateBoard(board_id: string, title: string) {
-    const sql = "update boards set title=$1 where id = $2 returning*";
-    const response = await query(sql, [title, board_id]);
-    return response.rows[0];
+  async findStatus(board_id: string) {
+    const sql = "select*from board_status where board_id =$1 and deleted=false";
+    const response = await query(sql, [board_id]);
+    return response.rows;
   }
 }
 
-export const boardQuery = new BoardQuery();
+export const boardStatusQuery = new BoardStatusQuery();

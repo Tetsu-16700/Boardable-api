@@ -21,6 +21,7 @@ class AuthService {
       return http.http500("Error in signup service", error);
     }
   }
+
   async login(data: IAuth) {
     try {
       const user = await userService.findUser(data.username);
@@ -34,13 +35,15 @@ class AuthService {
       const format = {
         id: user.response.data.id,
       };
+
       const token = jwt.sign(format, "supersecret");
 
-      return http.http200("login succesfully", { token });
+      return http.http200("login successfully", { token });
     } catch (error) {
       return http.http500("Error in login service", error);
     }
   }
+
   async validation(token: string) {
     try {
       if (!token) return http.http401("Error authenticating 2");
@@ -71,13 +74,14 @@ class AuthService {
       return http.http500("Error in login service", error);
     }
   }
+
   async updateUser(token: string, data: any) {
     try {
       console.log(data);
-      if (!token) return http.http401("Error authenticating");
+      if (!token) return http.http401("Error authenticating ");
       const { id } = jwt.verify(token, "supersecret") as any;
 
-      if (data.passwords.length) {
+      if (data.password.length) {
         const newPassword = await bcrypt.hash(data.password, 11);
 
         const res_update = await userQuery.updateUserWithPassword(
@@ -91,8 +95,9 @@ class AuthService {
       }
     } catch (error) {
       console.log(error);
-      return http.http500("Error in login service", error);
+      return http.http500("Error in update service", error);
     }
   }
 }
+
 export const authService = new AuthService();

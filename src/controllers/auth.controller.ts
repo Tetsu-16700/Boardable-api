@@ -6,6 +6,7 @@ class AuthController {
   async signup(req: Request, res: Response) {
     const data: IAuth = req.body;
     const res_created = await authService.signup(data);
+
     return res.status(res_created.code).json(res_created.response);
   }
 
@@ -23,20 +24,22 @@ class AuthController {
   async validation(req: Request, res: Response) {
     const token = req.get("Authorization") as any;
     const res_validation = await authService.validation(token);
+
     return res.status(res_validation.code).json(res_validation.response);
   }
 
   async me(req: Request, res: Response) {
     const token = req.get("Authorization") as any;
     const response = await authService.me(token);
+
     return res.status(response.code).json(response.response);
   }
 
   async updateUser(req: Request, res: Response) {
     const token = req.get("Authorization") as any;
-
     const data = req.body;
     const response = await authService.updateUser(token, data);
+
     return res.status(response.code).json(response.response);
   }
 
