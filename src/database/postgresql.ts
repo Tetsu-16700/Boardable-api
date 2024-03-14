@@ -10,7 +10,7 @@ export const pool = new Pool({
   port: 5432,
   database: "boardable",
   user: "postgres",
-  password: "admin",
+  password: "12345678",
 });
 
 export const query = (text: string, params?: (string | number | boolean)[]) => {

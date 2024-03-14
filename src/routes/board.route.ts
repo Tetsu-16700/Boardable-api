@@ -61,7 +61,6 @@ boardRouter.delete(
   boardController.deleteStatus
 );
 
-// board detail  ibamos a borrarlo ----------------------------------------------------------
 
 // cards --------------------------------------------------------
 
